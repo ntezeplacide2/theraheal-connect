@@ -59,37 +59,60 @@ const AdminDashboard = () => {
       // Fetch all doctors with approval status
       const { data: doctorsData, error: doctorsError } = await supabase
         .from('doctors')
-        .select(`
-          *,
-          profiles!inner (user_id, full_name, email, role, created_at)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (doctorsError) throw doctorsError;
 
+      // Fetch doctor profiles separately
+      const doctorsWithProfiles = await Promise.all(
+        doctorsData?.map(async (doc) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', doc.user_id)
+            .single();
+          
+          return {
+            id: profile?.id || '',
+            user_id: doc.user_id,
+            full_name: profile?.full_name || 'Unknown',
+            email: profile?.email || '',
+            role: profile?.role || 'doctor',
+            created_at: profile?.created_at || '',
+            specialization: doc.specialization,
+            is_approved: doc.is_approved
+          };
+        }) || []
+      );
+
       // Fetch all appointments
       const { data: appointmentsData, error: appointmentsError } = await supabase
         .from('appointments')
-        .select(`
-          *,
-          patient:patient_id (profiles!inner (full_name)),
-          doctor:doctor_id (profiles!inner (full_name))
-        `)
+        .select('*')
         .order('appointment_date', { ascending: false });
 
       if (appointmentsError) throw appointmentsError;
 
+      // Fetch appointment details with patient and doctor names
+      const appointmentsWithDetails = await Promise.all(
+        appointmentsData?.map(async (apt) => {
+          const [patientProfile, doctorProfile] = await Promise.all([
+            supabase.from('profiles').select('full_name').eq('user_id', apt.patient_id).single(),
+            supabase.from('profiles').select('full_name').eq('user_id', apt.doctor_id).single()
+          ]);
+          
+          return {
+            ...apt,
+            patient: { full_name: patientProfile.data?.full_name || 'Unknown Patient' },
+            doctor: { full_name: doctorProfile.data?.full_name || 'Unknown Doctor' }
+          };
+        }) || []
+      );
+
       setUsers(usersData || []);
-      setDoctors(doctorsData?.map(doc => ({
-        ...doc.profiles,
-        specialization: doc.specialization,
-        is_approved: doc.is_approved
-      })) || []);
-      setAppointments(appointmentsData?.map(apt => ({
-        ...apt,
-        patient: { full_name: apt.patient.profiles.full_name },
-        doctor: { full_name: apt.doctor.profiles.full_name }
-      })) || []);
+      setDoctors(doctorsWithProfiles);
+      setAppointments(appointmentsWithDetails);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({

@@ -47,23 +47,29 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ appointments }) => {
     try {
       const { data, error } = await supabase
         .from('chat_messages')
-        .select(`
-          *,
-          sender:sender_id (
-            profiles!inner (full_name)
-          )
-        `)
+        .select('*')
         .eq('appointment_id', selectedAppointment)
         .order('sent_at', { ascending: true });
 
       if (error) throw error;
 
-      const formattedMessages = data?.map(msg => ({
-        ...msg,
-        sender_name: msg.sender.profiles.full_name
-      })) || [];
+      // Fetch sender names separately
+      const messagesWithSenders = await Promise.all(
+        data?.map(async (msg) => {
+          const { data: senderProfile } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('user_id', msg.sender_id)
+            .single();
+          
+          return {
+            ...msg,
+            sender_name: senderProfile?.full_name || 'Unknown'
+          };
+        }) || []
+      );
 
-      setMessages(formattedMessages);
+      setMessages(messagesWithSenders);
     } catch (error) {
       console.error('Error fetching messages:', error);
     }

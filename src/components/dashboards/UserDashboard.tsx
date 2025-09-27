@@ -42,7 +42,14 @@ const UserDashboard = () => {
 
       if (error) throw error;
       
-      setAppointments(data || []);
+      // For now, use placeholder doctor data - we'll fetch doctor details separately if needed
+      const formattedAppointments = data?.map(apt => ({
+        ...apt,
+        doctor: {
+          full_name: 'Doctor',
+          specialization: 'Therapy'
+        }
+      })) || [];
       
       setAppointments(formattedAppointments);
     } catch (error) {

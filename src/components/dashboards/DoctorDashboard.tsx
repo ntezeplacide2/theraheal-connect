@@ -38,28 +38,33 @@ const DoctorDashboard = () => {
     try {
       const { data, error } = await supabase
         .from('appointments')
-        .select(`
-          *,
-          patient:patient_id (
-            user_id,
-            profiles!inner (full_name, email, phone)
-          )
-        `)
+        .select('*')
         .eq('doctor_id', profile?.user_id)
         .order('appointment_date', { ascending: false });
 
       if (error) throw error;
       
-      const formattedAppointments = data?.map(apt => ({
-        ...apt,
-        patient: {
-          full_name: apt.patient.profiles.full_name,
-          email: apt.patient.profiles.email,
-          phone: apt.patient.profiles.phone
-        }
-      })) || [];
+      // Fetch patient profiles separately
+      const appointmentsWithPatients = await Promise.all(
+        data?.map(async (apt) => {
+          const { data: patientProfile } = await supabase
+            .from('profiles')
+            .select('full_name, email, phone')
+            .eq('user_id', apt.patient_id)
+            .single();
+          
+          return {
+            ...apt,
+            patient: {
+              full_name: patientProfile?.full_name || 'Unknown Patient',
+              email: patientProfile?.email || '',
+              phone: patientProfile?.phone || ''
+            }
+          };
+        }) || []
+      );
       
-      setAppointments(formattedAppointments);
+      setAppointments(appointmentsWithPatients);
     } catch (error) {
       console.error('Error fetching appointments:', error);
     } finally {
