@@ -52,7 +52,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onBookingComplete }) => {
           hourly_rate,
           languages
         `)
-        .eq('is_approved', true);
+        .eq('status', 'approved');
       
       if (error) throw error;
 
@@ -103,10 +103,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ onBookingComplete }) => {
       const { data, error } = await supabase
         .from('appointments')
         .insert({
-          patient_id: profile.user_id,
+          patient_id: profile.id,
           doctor_id: formData.doctorId,
-          appointment_date: appointmentDateTime.toISOString(),
-          duration_minutes: formData.duration,
+          appointment_date: formData.appointmentDate,
+          appointment_time: formData.appointmentTime,
+          duration: formData.duration,
           notes: formData.notes,
           total_amount: totalAmount,
           status: 'pending',

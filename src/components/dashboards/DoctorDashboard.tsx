@@ -49,7 +49,7 @@ const DoctorDashboard = () => {
         data?.map(async (apt) => {
           const { data: patientProfile } = await supabase
             .from('profiles')
-            .select('full_name, email, phone')
+            .select('full_name, email')
             .eq('user_id', apt.patient_id)
             .single();
           
@@ -57,8 +57,7 @@ const DoctorDashboard = () => {
             ...apt,
             patient: {
               full_name: patientProfile?.full_name || 'Unknown Patient',
-              email: patientProfile?.email || '',
-              phone: patientProfile?.phone || ''
+              email: patientProfile?.email || ''
             }
           };
         }) || []

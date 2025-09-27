@@ -59,7 +59,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ appointments }) => {
           const { data: senderProfile } = await supabase
             .from('profiles')
             .select('full_name')
-            .eq('user_id', msg.sender_id)
+            .eq('id', msg.sender_id)
             .single();
           
           return {
@@ -104,11 +104,20 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ appointments }) => {
     setLoading(true);
 
     try {
+      // Get user's profile id
+      const { data: userProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', profile.user_id)
+        .single();
+
+      if (profileError) throw profileError;
+
       const { error } = await supabase
         .from('chat_messages')
         .insert({
           appointment_id: selectedAppointment,
-          sender_id: profile.user_id,
+          sender_id: userProfile.id,
           message: newMessage.trim()
         });
 

@@ -81,7 +81,7 @@ const AdminDashboard = () => {
             role: profile?.role || 'doctor',
             created_at: profile?.created_at || '',
             specialization: doc.specialization,
-            is_approved: doc.is_approved
+            is_approved: doc.status === 'approved'
           };
         }) || []
       );
@@ -129,7 +129,7 @@ const AdminDashboard = () => {
     try {
       const { error } = await supabase
         .from('doctors')
-        .update({ is_approved: approve })
+        .update({ status: approve ? 'approved' : 'rejected' })
         .eq('user_id', doctorUserId);
 
       if (error) throw error;
