@@ -14,155 +14,274 @@ export type Database = {
   }
   public: {
     Tables: {
-      appointments: {
+      clients: {
         Row: {
-          appointment_date: string
+          company: string
           created_at: string
-          doctor_id: string
-          duration_minutes: number | null
+          email: string | null
           id: string
-          notes: string | null
-          patient_id: string
-          payment_id: string | null
-          payment_status: string | null
-          status: string | null
-          total_amount: number
+          last_interaction: string | null
+          name: string
+          phone: string | null
+          status: string
+          tags: string[] | null
+          total_value: number | null
           updated_at: string
+          workspace_id: string
         }
         Insert: {
-          appointment_date: string
+          company: string
           created_at?: string
-          doctor_id: string
-          duration_minutes?: number | null
+          email?: string | null
           id?: string
-          notes?: string | null
-          patient_id: string
-          payment_id?: string | null
-          payment_status?: string | null
-          status?: string | null
-          total_amount: number
+          last_interaction?: string | null
+          name: string
+          phone?: string | null
+          status?: string
+          tags?: string[] | null
+          total_value?: number | null
           updated_at?: string
+          workspace_id: string
         }
         Update: {
-          appointment_date?: string
+          company?: string
           created_at?: string
-          doctor_id?: string
-          duration_minutes?: number | null
+          email?: string | null
           id?: string
-          notes?: string | null
-          patient_id?: string
-          payment_id?: string | null
-          payment_status?: string | null
-          status?: string | null
-          total_amount?: number
+          last_interaction?: string | null
+          name?: string
+          phone?: string | null
+          status?: string
+          tags?: string[] | null
+          total_value?: number | null
           updated_at?: string
-        }
-        Relationships: []
-      }
-      chat_messages: {
-        Row: {
-          appointment_id: string
-          id: string
-          message: string
-          sender_id: string
-          sent_at: string
-        }
-        Insert: {
-          appointment_id: string
-          id?: string
-          message: string
-          sender_id: string
-          sent_at?: string
-        }
-        Update: {
-          appointment_id?: string
-          id?: string
-          message?: string
-          sender_id?: string
-          sent_at?: string
+          workspace_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "chat_messages_appointment_id_fkey"
-            columns: ["appointment_id"]
+            foreignKeyName: "clients_workspace_id_fkey"
+            columns: ["workspace_id"]
             isOneToOne: false
-            referencedRelation: "appointments"
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
       }
-      doctors: {
+      history: {
         Row: {
-          availability: Json | null
-          bio: string | null
+          action: string
           created_at: string
-          experience_years: number | null
-          hourly_rate: number | null
+          description: string | null
+          entity_id: string | null
+          entity_type: string
           id: string
-          is_approved: boolean | null
-          languages: string[] | null
-          specialization: string
-          updated_at: string
+          metadata: Json | null
           user_id: string
+          workspace_id: string
         }
         Insert: {
-          availability?: Json | null
-          bio?: string | null
+          action: string
           created_at?: string
-          experience_years?: number | null
-          hourly_rate?: number | null
+          description?: string | null
+          entity_id?: string | null
+          entity_type: string
           id?: string
-          is_approved?: boolean | null
-          languages?: string[] | null
-          specialization: string
-          updated_at?: string
+          metadata?: Json | null
           user_id: string
+          workspace_id: string
         }
         Update: {
-          availability?: Json | null
-          bio?: string | null
+          action?: string
           created_at?: string
-          experience_years?: number | null
-          hourly_rate?: number | null
+          description?: string | null
+          entity_id?: string | null
+          entity_type?: string
           id?: string
-          is_approved?: boolean | null
-          languages?: string[] | null
-          specialization?: string
-          updated_at?: string
+          metadata?: Json | null
           user_id?: string
+          workspace_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "history_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          company_name: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          industry: string
+          location: string
+          notes: string | null
+          region: string
+          status: string
+          tags: string[] | null
+          updated_at: string
+          website: string | null
+          workspace_id: string
+        }
+        Insert: {
+          company_name: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          industry: string
+          location: string
+          notes?: string | null
+          region: string
+          status?: string
+          tags?: string[] | null
+          updated_at?: string
+          website?: string | null
+          workspace_id: string
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          industry?: string
+          location?: string
+          notes?: string | null
+          region?: string
+          status?: string
+          tags?: string[] | null
+          updated_at?: string
+          website?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           email: string
-          full_name: string
+          full_name: string | null
           id: string
-          phone: string | null
-          role: Database["public"]["Enums"]["user_role"]
+          role: string
           updated_at: string
-          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          role?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          role?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reports: {
+        Row: {
+          created_at: string
+          data: Json | null
+          deals_done: number | null
+          deals_failed: number | null
+          deals_ongoing: number | null
+          id: string
+          title: string
+          type: string
+          updated_at: string
+          workspace_id: string
         }
         Insert: {
           created_at?: string
-          email: string
-          full_name: string
+          data?: Json | null
+          deals_done?: number | null
+          deals_failed?: number | null
+          deals_ongoing?: number | null
           id?: string
-          phone?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
+          title: string
+          type: string
           updated_at?: string
-          user_id: string
+          workspace_id: string
         }
         Update: {
           created_at?: string
-          email?: string
-          full_name?: string
+          data?: Json | null
+          deals_done?: number | null
+          deals_failed?: number | null
+          deals_ongoing?: number | null
           id?: string
-          phone?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
+          title?: string
+          type?: string
           updated_at?: string
-          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspaces: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_id: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          slug?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -171,21 +290,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_user_role: {
-        Args: { user_uuid: string }
-        Returns: string
-      }
-      is_admin: {
-        Args: { user_uuid: string }
-        Returns: boolean
-      }
-      is_doctor: {
-        Args: { user_uuid: string }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      user_role: "user" | "doctor" | "admin"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -312,8 +420,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      user_role: ["user", "doctor", "admin"],
-    },
+    Enums: {},
   },
 } as const
