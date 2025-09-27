@@ -163,25 +163,7 @@ const Contact = () => {
             </Card>
 
             {/* Quick Actions */}
-            <Card className="shadow-medium bg-gradient-card">
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-4">Quick Actions</h3>
-                <div className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Book a Session
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Start Live Chat
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Request Callback
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            
           </div>
         </div>
       </div>
