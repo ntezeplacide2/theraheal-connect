@@ -176,17 +176,17 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ appointments }) => {
                 messages.map((message) => (
                   <div
                     key={message.id}
-                    className={`flex ${message.sender_id === profile?.user_id ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${message.sender_id === profile?.id ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
                       className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        message.sender_id === profile?.user_id
+                        message.sender_id === profile?.id
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted'
                       }`}
                     >
                       <div className="flex items-start space-x-2">
-                        {message.sender_id !== profile?.user_id && (
+                        {message.sender_id !== profile?.id && (
                           <Avatar className="h-6 w-6">
                             <AvatarFallback className="text-xs">
                               {message.sender_name?.[0] || 'D'}
@@ -194,7 +194,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ appointments }) => {
                           </Avatar>
                         )}
                         <div className="flex-1">
-                          {message.sender_id !== profile?.user_id && (
+                          {message.sender_id !== profile?.id && (
                             <p className="text-xs font-medium mb-1">{message.sender_name}</p>
                           )}
                           <p className="text-sm">{message.message}</p>

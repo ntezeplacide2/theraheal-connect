@@ -46,36 +46,26 @@ const BookingForm: React.FC<BookingFormProps> = ({ onBookingComplete }) => {
       const { data, error } = await supabase
         .from('doctors')
         .select(`
+          id,
           user_id,
           specialization,
           bio,
           hourly_rate,
-          languages
+          languages,
+          profiles!doctors_user_id_fkey(full_name)
         `)
         .eq('status', 'approved');
       
       if (error) throw error;
 
-      // Fetch profiles for each doctor
-      const doctorIds = data?.map(d => d.user_id) || [];
-      const { data: profilesData } = await supabase
-        .from('profiles')
-        .select('user_id, full_name')
-        .in('user_id', doctorIds);
-
-      if (error) throw error;
-
-      const formattedDoctors = data?.map(doc => {
-        const profile = profilesData?.find(p => p.user_id === doc.user_id);
-        return {
-          user_id: doc.user_id,
-          full_name: profile?.full_name || 'Unknown Doctor',
-          specialization: doc.specialization,
-          bio: doc.bio,
-          hourly_rate: doc.hourly_rate,
-          languages: doc.languages
-        };
-      }) || [];
+      const formattedDoctors = data?.map((doc: any) => ({
+        user_id: doc.id, // Use doctor.id for appointments
+        full_name: doc.profiles?.full_name || 'Unknown Doctor',
+        specialization: doc.specialization,
+        bio: doc.bio,
+        hourly_rate: doc.hourly_rate,
+        languages: doc.languages
+      })) || [];
 
       setDoctors(formattedDoctors);
     } catch (error) {

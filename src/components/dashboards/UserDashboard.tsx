@@ -36,18 +36,23 @@ const UserDashboard = () => {
     try {
       const { data, error } = await supabase
         .from('appointments')
-        .select('*')
-        .eq('patient_id', profile?.user_id)
+        .select(`
+          *,
+          doctors!appointments_doctor_id_fkey(
+            specialization,
+            profiles!doctors_user_id_fkey(full_name)
+          )
+        `)
+        .eq('patient_id', profile?.id)
         .order('appointment_date', { ascending: false });
 
       if (error) throw error;
       
-      // For now, use placeholder doctor data - we'll fetch doctor details separately if needed
-      const formattedAppointments = data?.map(apt => ({
+      const formattedAppointments = data?.map((apt: any) => ({
         ...apt,
         doctor: {
-          full_name: 'Doctor',
-          specialization: 'Therapy'
+          full_name: apt.doctors?.profiles?.full_name || 'Unknown Doctor',
+          specialization: apt.doctors?.specialization || 'Therapy'
         }
       })) || [];
       

@@ -10,7 +10,7 @@ import NotFound from "./pages/NotFound";
 import Unauthorized from "./pages/Unauthorized";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext";
-import LiveChat from "./components/LiveChat";
+
 
 const queryClient = new QueryClient();
 
@@ -33,7 +33,6 @@ const App = () => (
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <LiveChat />
           <Toaster />
           <Sonner />
         </BrowserRouter>

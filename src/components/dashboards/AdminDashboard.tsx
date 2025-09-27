@@ -59,32 +59,24 @@ const AdminDashboard = () => {
       // Fetch all doctors with approval status
       const { data: doctorsData, error: doctorsError } = await supabase
         .from('doctors')
-        .select('*')
+        .select(`
+          *,
+          profiles!doctors_user_id_fkey(*)
+        `)
         .order('created_at', { ascending: false });
 
       if (doctorsError) throw doctorsError;
 
-      // Fetch doctor profiles separately
-      const doctorsWithProfiles = await Promise.all(
-        doctorsData?.map(async (doc) => {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', doc.user_id)
-            .single();
-          
-          return {
-            id: profile?.id || '',
-            user_id: doc.user_id,
-            full_name: profile?.full_name || 'Unknown',
-            email: profile?.email || '',
-            role: profile?.role || 'doctor',
-            created_at: profile?.created_at || '',
-            specialization: doc.specialization,
-            is_approved: doc.status === 'approved'
-          };
-        }) || []
-      );
+      const doctorsWithProfiles = doctorsData?.map((doc: any) => ({
+        id: doc.profiles?.id || '',
+        user_id: doc.user_id,
+        full_name: doc.profiles?.full_name || 'Unknown',
+        email: doc.profiles?.email || '',
+        role: doc.profiles?.role || 'doctor',
+        created_at: doc.profiles?.created_at || '',
+        specialization: doc.specialization,
+        is_approved: doc.status === 'approved'
+      })) || [];
 
       // Fetch all appointments
       const { data: appointmentsData, error: appointmentsError } = await supabase

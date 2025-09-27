@@ -36,32 +36,37 @@ const DoctorDashboard = () => {
 
   const fetchAppointments = async () => {
     try {
+      // First get doctor record to find appointments
+      const { data: doctorData } = await supabase
+        .from('doctors')
+        .select('id')
+        .eq('user_id', profile?.id)
+        .single();
+
+      if (!doctorData) {
+        setAppointments([]);
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('appointments')
-        .select('*')
-        .eq('doctor_id', profile?.user_id)
+        .select(`
+          *,
+          profiles!appointments_patient_id_fkey(full_name, email)
+        `)
+        .eq('doctor_id', doctorData.id)
         .order('appointment_date', { ascending: false });
 
       if (error) throw error;
       
-      // Fetch patient profiles separately
-      const appointmentsWithPatients = await Promise.all(
-        data?.map(async (apt) => {
-          const { data: patientProfile } = await supabase
-            .from('profiles')
-            .select('full_name, email')
-            .eq('user_id', apt.patient_id)
-            .single();
-          
-          return {
-            ...apt,
-            patient: {
-              full_name: patientProfile?.full_name || 'Unknown Patient',
-              email: patientProfile?.email || ''
-            }
-          };
-        }) || []
-      );
+      const appointmentsWithPatients = data?.map((apt: any) => ({
+        ...apt,
+        patient: {
+          full_name: apt.profiles?.full_name || 'Unknown Patient',
+          email: apt.profiles?.email || ''
+        }
+      })) || [];
       
       setAppointments(appointmentsWithPatients);
     } catch (error) {
