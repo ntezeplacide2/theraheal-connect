@@ -150,6 +150,8 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { MessageCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Memoized professional data
 const PROFESSIONALS = [
@@ -220,15 +222,20 @@ const BackgroundPattern = () => (
 const BookingForm = () => {
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleBooking = useCallback(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
     if (!selectedDoctor || !selectedDate) {
       alert('Please select both doctor and date');
       return;
     }
-    // Implement booking logic
-    console.log('Booking appointment...');
-  }, [selectedDoctor, selectedDate]);
+    navigate('/dashboard');
+  }, [selectedDoctor, selectedDate, navigate, user]);
 
   return (
     <div className="flex flex-col sm:flex-row items-center gap-4 bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-lg transition-all duration-300 hover:shadow-2xl hover:bg-white/15">
@@ -264,10 +271,16 @@ const BookingForm = () => {
 };
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
   const handleSignUp = useCallback(() => {
-    // Implement sign up logic
-    console.log('Sign up clicked...');
-  }, []);
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      navigate('/auth');
+    }
+  }, [navigate, user]);
 
   return (
     <section
@@ -297,7 +310,7 @@ const Hero = () => {
               size="lg"
               className="bg-white text-primary hover:bg-white/90 transition-all shadow-lg mb-6 w-full sm:w-auto transform hover:-translate-y-0.5 hover:shadow-xl"
             >
-              Sign Up Free
+              {user ? 'Go to Dashboard' : 'Get Started'}
             </Button>
 
             <BookingForm />

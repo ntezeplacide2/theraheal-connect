@@ -2,9 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Heart, Mail, Phone, MapPin, Globe } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import logo from "@/assets/logo.jpeg";
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   return (
     <footer className="bg-primary-dark text-white">
       <div className="container mx-auto px-4 py-16">
@@ -42,9 +46,15 @@ const Footer = () => {
               <a href="#services" className="block text-primary-light hover:text-white transition-colors">
                 Services
               </a>
-              <a href="#contact" className="block text-primary-light hover:text-white transition-colors">
-                Contact
-              </a>
+               <a href="#contact" className="block text-primary-light hover:text-white transition-colors">
+                 Contact
+               </a>
+               <button 
+                 onClick={() => navigate(user ? '/dashboard' : '/auth')}
+                 className="block text-primary-light hover:text-white transition-colors text-left"
+               >
+                 {user ? 'Dashboard' : 'Login / Sign Up'}
+               </button>
             </nav>
           </div>
 
@@ -94,9 +104,13 @@ const Footer = () => {
                     placeholder="Your email" 
                     className="bg-white/10 border-white/20 text-white placeholder:text-white/70"
                   />
-                  <Button variant="secondary" size="sm">
-                    Subscribe
-                  </Button>
+                   <Button 
+                     variant="secondary" 
+                     size="sm"
+                     onClick={() => navigate(user ? '/dashboard' : '/auth')}
+                   >
+                     {user ? 'Dashboard' : 'Get Started'}
+                   </Button>
                 </div>
               </div>
             </div>

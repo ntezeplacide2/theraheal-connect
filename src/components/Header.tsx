@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Globe } from "lucide-react";
+import { Menu, X, Globe, LogOut, User } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.jpeg";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [language, setLanguage] = useState("EN");
+  const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const languages = [
     { code: "EN", name: "English" },
@@ -64,12 +68,39 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           
-          <Button variant="outline" size="sm">
-            Login
-          </Button>
-          <Button className="bg-gradient-primary hover:opacity-90 transition-opacity">
-            Get Started
-          </Button>
+          {user ? (
+            <div className="flex items-center space-x-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="font-medium">
+                    <User className="h-4 w-4 mr-2" />
+                    {profile?.full_name || user.email}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            <>
+              <Button variant="outline" size="sm" onClick={() => navigate('/auth')}>
+                Login
+              </Button>
+              <Button 
+                className="bg-gradient-primary hover:opacity-90 transition-opacity"
+                onClick={() => navigate('/auth')}
+              >
+                Get Started
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -103,12 +134,25 @@ const Header = () => {
               Contact
             </a>
             <div className="flex items-center space-x-2 pt-4 border-t">
-              <Button variant="outline" size="sm" className="flex-1">
-                Login
-              </Button>
-              <Button className="bg-gradient-primary hover:opacity-90 transition-opacity flex-1">
-                Get Started
-              </Button>
+              {user ? (
+                <>
+                  <Button variant="outline" size="sm" className="flex-1" onClick={() => navigate('/dashboard')}>
+                    Dashboard
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1" onClick={signOut}>
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" size="sm" className="flex-1" onClick={() => navigate('/auth')}>
+                    Login
+                  </Button>
+                  <Button className="bg-gradient-primary hover:opacity-90 transition-opacity flex-1" onClick={() => navigate('/auth')}>
+                    Get Started
+                  </Button>
+                </>
+              )}
             </div>
           </nav>
         </div>
